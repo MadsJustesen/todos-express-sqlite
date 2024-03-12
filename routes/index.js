@@ -124,6 +124,7 @@ router.post('/clear-completed', function(req, res, next) {
 router.get('/search', fetchTodos, function(req, res, next) {
   searchQuery = req.query.q;
   if (searchQuery != null) {
+    // Using filter on fetchTodos function. A query with something like "SELECT * FROM todos WHERE title LIKE %q%" would be preferred on a bigger database
     res.json(res.locals.todos.filter(function(todo) { return todo.title.includes(searchQuery); }));
   } else {
     res.json({ error: { message: "Missing search query"}})
