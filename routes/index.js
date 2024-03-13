@@ -1,8 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var db = require('../db');
-var axios = require('axios')
-const { render } = require('ejs');
+const express = require('express');
+const router = express.Router();
+const db = require('../db');
+const axios = require('axios')
 
 function fetchTodos(req, res, next) {
   db.all('SELECT * FROM todos', [], function(err, rows) {
@@ -119,17 +118,6 @@ router.post('/clear-completed', function(req, res, next) {
     return res.redirect('/' + (req.body.filter || ''));
   });
 });
-
-// Api. In a production app, I would reorganize routes, e.g. separate folders for 'api routes' and 'frontend routes'
-router.get('/search', fetchTodos, function(req, res, next) {
-  searchQuery = req.query.q;
-  if (searchQuery != null && searchQuery.trim().length > 0) {
-    // Using filter on fetchTodos function. A query with something like "SELECT * FROM todos WHERE title LIKE %q%" would be preferred on a bigger database
-    res.json(res.locals.todos.filter(function(todo) { return todo.title.includes(searchQuery); }));
-  } else {
-    res.json({ error: { message: "Missing search query"}})
-  }
-})
 
 
 module.exports = router;
