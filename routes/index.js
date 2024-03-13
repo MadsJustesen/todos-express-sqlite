@@ -1,6 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var db = require('../db');
+const express = require('express');
+const router = express.Router();
+const db = require('../db');
+const axios = require('axios')
 
 function fetchTodos(req, res, next) {
   db.all('SELECT * FROM todos', [], function(err, rows) {
@@ -11,7 +12,10 @@ function fetchTodos(req, res, next) {
         id: row.id,
         title: row.title,
         completed: row.completed == 1 ? true : false,
-        url: '/' + row.id
+        url: '/' + row.id,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        synchronized: row.synchronized
       }
     });
     res.locals.todos = todos;
@@ -51,8 +55,19 @@ router.post('/', function(req, res, next) {
     req.body.completed == true ? 1 : null
   ], function(err) {
     if (err) { return next(err); }
-    return res.redirect('/' + (req.body.filter || ''));
+    lastId = this.lastID
+    db.get('SELECT * FROM todos where ID = ?', [lastId], function(err, row) {
+      axios.post('https://postman-echo.com/post', row)
+        .then(function(response) {
+          if (response.status == 200) {
+            db.run('UPDATE todos SET synchronized = 1 WHERE id = ?', [lastId]);
+          }
+        });
+    })
+    next();
   });
+}, function(req, res, next) {
+  return res.redirect('/' + (req.body.filter || ''));
 });
 
 router.post('/:id(\\d+)', function(req, res, next) {
@@ -103,5 +118,6 @@ router.post('/clear-completed', function(req, res, next) {
     return res.redirect('/' + (req.body.filter || ''));
   });
 });
+
 
 module.exports = router;
