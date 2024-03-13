@@ -11,7 +11,7 @@ db.serialize(function() {
     title TEXT NOT NULL, \
     completed INTEGER, \
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP, \
-    updated_at DATETIME, \
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, \
     synchronized INTEGER \
   )"); // I added the extra fields in the create statement. In a production app, I would do migrations instead
 
