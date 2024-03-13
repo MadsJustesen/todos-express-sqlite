@@ -16,7 +16,7 @@ function mapRows(rows) {
 
 exports.search = (phrase, callback) => {
   db.all("SELECT * FROM todos WHERE title LIKE ? LIMIT 10", ["%".concat(phrase, "%")], function(err, rows) {
-    if (err) { return err.message }
+    if (err) { return err }
     callback(err, mapRows(rows))
   });
 }
